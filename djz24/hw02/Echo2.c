@@ -18,7 +18,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include “tokens.c”
+#include "tokens.c"
 
 /*
  * define flags: [+/-]echo 
@@ -85,6 +85,16 @@ int	main( int argc, char *argv[])
           state = 4;
         else if (state == 4) // was just a comment *
           state = 3;         // back to 'in block comment'
+      }
+      else if (c == '#'){
+        if (state == 0 )
+          state = 2;
+        else if  (state == 1)
+          state = 0;
+        else if (state == 4) // was just a comment *
+          state = 3;         // back to 'in block comment'
+        else if (state == 5) // we are finally truly out of a comment
+          state = 0;
       }
       else if (c == '\n' && state == 2){
         state = 0;
