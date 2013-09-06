@@ -9,4 +9,4 @@ void b() { x = (x+1); printf ("%d\n", x) ; }
 
 void c() { int x = 1; printf ("%d\n", (x+1)); }
 
-int main() { b(); c(); }
+int main() { b(); c(); return 0;}
