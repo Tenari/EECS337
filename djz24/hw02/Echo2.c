@@ -42,8 +42,28 @@
 #define IN_RETURN4 93
 #define IN_RETURN5 94
 #define IN_ID 1
+#define IN_LITERAL 2
+
   int parse_state = 0; // 0 = in nothing
   char ident_arr[64];
+  char lit_arr[64];
+
+void my_handle_lit(char c){
+  parse_state = IN_LITERAL;
+  int it;
+  for(it = 0; it < 64; it++){
+    if(lit_arr[it] == 0){
+      lit_arr[it] = c;
+      it = 500;
+    }
+  }
+}
+void clear_lit_arr(){
+  int poo = 0;
+  for(poo = 0; poo < 64; poo++){
+    lit_arr[ poo] = 0;
+  }
+}
 
 void my_handle_id(char c){
   int poo = 0;
@@ -66,6 +86,17 @@ void my_redo_char(char c){
   my_putchar( c);
 }
 
+void finish_id( char c){
+  if (isalpha( c)){
+    // handle another id character
+    my_handle_id( c);
+  } else{
+    print_token( IDENTIFIER, ident_arr);
+    clear_ident_arr();
+    my_redo_char( c);
+  }
+}
+
 void my_putchar(char c){
   char text[2];
   if (parse_state == 0){
@@ -82,6 +113,9 @@ void my_putchar(char c){
         break;
       case 'r':
         parse_state = IN_RETURN;
+        break;
+      case '"':
+        my_handle_lit( c);
         break;
       case '(':
       case ')':
@@ -123,99 +157,145 @@ void my_putchar(char c){
       my_handle_id(c);
 
   } else if(parse_state == IN_ID){
-    if (isalpha( c)){
-      // handle another id character
-      my_handle_id( strcat( ident_arr, c));
-    } else{
-      print_token( IDENTIFIER, ident_arr);
-      my_redo_char( c);
+    finish_id( c);
+  } else if (parse_state == IN_LITERAL){
+    if (c == '"'){
+      my_handle_lit( c);
+      print_token( STRING_LITERAL, lit_arr);
+      clear_lit_arr();
+      parse_state = 0;
+    } else {
+      my_handle_lit( c);
     }
   } else {
     switch( parse_state){
       case IN_VOID:
         if (c == 'o')
           parse_state = IN_VOID2;
-        else
-          my_handle_id( strcat("v",c));
+        else {
+          my_handle_id( 'v');
+          finish_id( c);
+        }
         break;
       case IN_VOID2:
         if (c == 'i')
           parse_state = IN_VOID3;
-        else
-          my_handle_id( strcat("vo", c));
+        else {
+          my_handle_id( 'v');
+          my_handle_id( 'o');
+          finish_id( c);
+        }
         break;
       case IN_VOID3:
         if (c == 'd'){
           parse_state = 0;
           print_token( VOID, "void");
-        } else
-          my_handle_id( strcat("voi", c));
+        } else {
+          my_handle_id( 'v');
+          my_handle_id( 'o');
+          my_handle_id( 'i');
+          finish_id( c);
+        }
         break;
 
       case IN_INT:
         if (c == 'n')
           parse_state = IN_INT2;
-        else
-          my_handle_id( strcat("i", c));
+        else {
+          my_handle_id( 'i');
+          finish_id( c);
+        }
         break;
       case IN_INT2:
         if (c == 't'){
           parse_state = 0;
           print_token( INT, "int");
-        } else
-          my_handle_id( strcat("in", c));
+        } else {
+          my_handle_id( 'i');
+          my_handle_id( 'n');
+          finish_id( c);
+        }
         break;
 
       case IN_CHAR:
         if (c == 'h')
           parse_state = IN_CHAR2;
-        else
-          my_handle_id( strcat("c", c));
+        else {
+          my_handle_id( 'c');
+          finish_id( c);
+        }
         break;
       case IN_CHAR2:
         if (c == 'a')
           parse_state = IN_CHAR3;
-        else
-          my_handle_id( strcat("ch", c));
+        else{
+          my_handle_id( 'c');
+          my_handle_id( 'h');
+          finish_id( c);
+        }
         break;
       case IN_CHAR3:
         if (c == 'r'){
           parse_state = 0;
           print_token( CHAR, "char");
-        } else
-          my_handle_id( strcat("cha", c));
+        } else {
+          my_handle_id( 'c');
+          my_handle_id( 'h');
+          my_handle_id( 'a');
+          finish_id( c);
+        }
         break;
 
       case IN_RETURN:
         if (c == 'e')
           parse_state = IN_RETURN2;
-        else
-          my_handle_id( strcat("r", c));
+        else {
+          my_handle_id( 'r');
+          finish_id( c);
+        }
         break;
       case IN_RETURN2:
         if (c == 't')
           parse_state = IN_RETURN3;
-        else
-          my_handle_id( strcat("re", c));
+        else {
+          my_handle_id( 'r');
+          my_handle_id( 'e');
+          finish_id( c);
+        }
         break;
       case IN_RETURN3:
         if (c == 'u')
           parse_state = IN_RETURN4;
-        else
-          my_handle_id( strcat("ret", c));
+        else {
+          my_handle_id( 'r');
+          my_handle_id( 'e');
+          my_handle_id( 't');
+          finish_id( c);
+        }
         break;
       case IN_RETURN4:
         if (c == 'r')
           parse_state = IN_RETURN5;
-        else
-          my_handle_id( strcat("retu", c));
+        else {
+          my_handle_id( 'r');
+          my_handle_id( 'e');
+          my_handle_id( 't');
+          my_handle_id( 'u');
+          finish_id( c);
+        }
         break;
       case IN_RETURN5:
         if (c == 'n'){
           parse_state = 0;
           print_token( RETURN, "return");
-        } else
-          my_handle_id( strcat("retur", c));
+        } else {
+          my_handle_id( 'r');
+          my_handle_id( 'e');
+          my_handle_id( 't');
+          my_handle_id( 'u');
+          my_handle_id( 'r');
+          finish_id( c);
+        }
         break;
       default:
         break;
