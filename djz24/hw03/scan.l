@@ -4,7 +4,7 @@
 *
 * DESC:		EECS 337 Assignment 3
 *
-* AUTHOR:	caseid
+* AUTHOR:	djz24
 *
 * DATE:		September 10, 2013
 *
