@@ -54,7 +54,8 @@ extern	char	*yytext;
 extern	YYSTYPE yylval;
 extern	int	yywrap( void);
 extern	void	comment( void);
-extern	void	count( void);
+extern	void	commentT( void);
+extern	void	count( int token);
 extern	int	check_type( void);
 /*
  *	external variables and functions from gram.y
