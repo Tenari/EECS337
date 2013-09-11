@@ -135,25 +135,39 @@ int yywrap( void)
 void comment( void)
 {
 	char c, c1;
+  int state = 0;  // 0 = entered comment
+                  // 1 = found *
+                  // 5 = finished comment
 
 	if( IS_FLAGS_ECHO( data.flags))
 	    ECHO;
-loop:
-	while(( c = input()) != '*' && c != 0)
+  while(state != 5){
+    c = input();
+
+    if( c == 0)
+      state = 5;
+
+    switch(state){
+      case 0:
+        if( c == '*')
+          state = 1;
 	      if( c && IS_FLAGS_ECHO( data.flags))
 	      	  putchar(c);
-	if( c != 0)
-	      if( IS_FLAGS_ECHO( data.flags))
+        break;
+      case 1:
+        if( c == '/')
+          state = 5;
+        else
+          state = 0;
+	      if( c && IS_FLAGS_ECHO( data.flags))
 	      	  putchar(c);
-
-	if(( c1 = input()) != '/' && c != 0)
-	{
-		unput(c1);
-		goto loop;
-	}
-	if( c != 0)
-	      if( IS_FLAGS_ECHO( data.flags))
-	      	  putchar(c1);
+        break;
+      case 5:
+      default:
+        //do nothing
+        break;
+    }
+  }
 }
 
 void commentT( void)
