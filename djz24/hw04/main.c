@@ -32,6 +32,15 @@ int	main_init( void)
  */
 int	main_exit( void)
 {
+  /*
+   * print the attribute table 
+   */
+  #ifdef YYDEBUG
+    if( IS_FLAGS_SYMBOL( data.flags))
+    {
+      print_attribute_table();
+    }
+  #endif
 	return 0;
 }
 
@@ -60,6 +69,11 @@ void	main_process_flags( char *command)
 			yydebug = 0;
 			return;
 		}
+    else if( !strncmp( command, "-symbol", strlen( command)))
+    {
+      CLR_FLAGS_SYMBOL( data.flags);
+      return;
+    }
 		break;
 	case '+':
 		if( !strncmp( command, "+echo", strlen( command)))
@@ -77,6 +91,11 @@ void	main_process_flags( char *command)
 			yydebug = 1;
 			return;
 		}
+    else if( !strncmp( command, "+symbol", strlen( command)))
+    {
+      SET_FLAGS_SYMBOL( data.flags);
+      return;
+    }
 		break;
 	default:
 /*
@@ -102,7 +121,7 @@ void	main_process_flags( char *command)
 			return;
 		}
 	}
-	fprintf( stdout, "Usage: ansi_c [[+|-]echo] [[+|-]debug] [[+|-]yydebug] [filename] [...]\n");
+	fprintf( stdout, "Usage: ansi_c [[+|-]echo] [[+|-]debug] [[+|-]yydebug] [[+|-]symbol] [filename] [...]\n");
 	exit( -1);
 }
 
