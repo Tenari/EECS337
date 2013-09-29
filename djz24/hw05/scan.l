@@ -22,8 +22,10 @@
 
 %%
 
+"a"	{ yylval = 'a'; return 'a'; }
+"b"	{ yylval = 'b'; return 'b'; }
 [\n]	{ yylval = (int) yytext[0]; return yytext[ 0]; }
-.	{ yylval = (int) yytext[0]; return yytext[ 0]; } /* return everything else */
+.	{  } /* return everything else */
 
 %%
 
