@@ -30,6 +30,23 @@
 %%
 
 /*
+* resync the parser with a syntax error
+*/
+void yysync( void)
+{
+  int c;
+  data.errors++;
+  while (( c = getc( yyin )) != EOF)
+  {
+    if( c == '\n')
+    {
+      unput( c);
+      break;
+    }
+  }
+}
+
+/*
  *	yywrap function
  */
 int	yywrap( void)

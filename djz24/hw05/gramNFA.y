@@ -17,17 +17,25 @@
 
 %}
 
-%start line
+%start lines
 
 %%
 
 // NFA 
-line		: A0 '\n'
-		| line A0 '\n'
-		;
-A0		: aletter A0
-		| bletter A0
-		| /* empty */ { printf( "NFA A0: accept\n"); }
+lines  : line
+       | lines line
+       | error '\n' { yysync(); yyerrok; }
+       ;
+line   : A0 end '\n'{ printf( "NFA line: accept\n"); }
+       | end '\n' { printf( "NFA line: accept\n"); }
+       ;
+end: aletter bletter aletter
+   | bletter bletter aletter
+   | aletter bletter bletter
+   | bletter bletter bletter
+   ;
+A0		: aletter A0 
+		|  bletter A0	 
 		;
 aletter		: 'a'
 		;

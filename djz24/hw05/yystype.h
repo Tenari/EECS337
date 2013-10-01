@@ -4,7 +4,7 @@
 *
 * DESC:		EECS 337 Assignment 5
 *
-* AUTHOR:	caseid
+* AUTHOR:	djz24
 *
 * DATE:		October 1, 2013
 *
@@ -27,6 +27,7 @@ DATA
 {
 	int	column;
 	int	flags;
+  int errors;
 #define	FLAGS_ECHO	0x0001
 #define	FLAGS_DEBUG	0x0002
 #define	FLAGS_PARSE	0x0004
@@ -48,6 +49,7 @@ DATA
 /*
  *	external variables and functions from scan.l
  */
+extern void yysync( void);
 extern FILE	*yyin;
 extern FILE	*yyout;
 extern	char	*yytext;
