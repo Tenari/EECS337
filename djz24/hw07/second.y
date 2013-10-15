@@ -23,6 +23,7 @@
 
 %token INTEGER
 %token FLOAT
+%token IDENTIFIER
 
 %left '|'
 %left '^'
@@ -43,8 +44,15 @@ lines	: lines expr '\n'
        case FLOAT:
          printf("%Lg\n", $2.dvalue);
          break;
+       case IDENTIFIER:
+         printf( "%s\n", symbol_tables[ $2.index].buffer);
+         break;
      }
    }
+  | lines ident '=' expr '\n' 
+    {
+      symbol_tables[ $2.index].yylval = $4;
+    }
 	| lines '\n' 
 	| /* empty */
 	| error '\n' { yyerror(" reenter previous line: "); yyerrok; }
@@ -333,11 +341,17 @@ expr	: expr '+' expr
      }
    }
 	| number
+  | ident
+    {
+      $$ = symbol_tables[ $1.index].yylval;
+    }
 	;
 
 number	: INTEGER
         | FLOAT
 	;
+ident   : IDENTIFIER
+        ;
 %%
 
 void	yyerror( char *s)

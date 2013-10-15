@@ -35,19 +35,31 @@ unsigned int symbol_table_index = 0;
  */
 int identifier( char *buffer, unsigned int length)
 {
+  int i;
   /*
    * find the same string and return the index
    */
+  for (i = 0; i < symbol_table_index; i++){
+    if (strcmp(symbol_tables[i].buffer, buffer)){
+      return i;
+    }
+  }
   /*
    * else update to the next symbol table field
    */
-   return symbol_table_index;
+  strcpy( symbol_tables[symbol_table_index].buffer, buffer);
+  symbol_tables[symbol_table_index].length = length;
+  symbol_tables[symbol_table_index].yylval.type = IDENTIFIER;
+  symbol_tables[symbol_table_index].yylval.index = symbol_table_index;
+  symbol_table_index++;
+  return symbol_table_index;
 };
 %}
 
 %%
 
 "$"		{ return( EOF); }
+{L}({L}|{D})* { yylval.type = IDENTIFIER; yylval.index = identifier( yytext, yyleng + 1); return( IDENTIFIER); }
 0[xX]{H}+{IS}? { sscanf( yytext, "%Lx", &yylval.lvalue); yylval.type = INTEGER; return( INTEGER); }
 0{D}+{IS}? { sscanf( yytext, "%Lo", &yylval.lvalue); yylval.type = INTEGER; return( INTEGER); }
 {D}+{IS}? { sscanf( yytext, "%Ld", &yylval.lvalue); yylval.type = INTEGER; return( INTEGER); }

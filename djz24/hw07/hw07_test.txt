@@ -1,0 +1,102 @@
+rm -f first.c second.c y.tab.h y.output *.o
+yacc -dv second.y 
+mv -f y.tab.c second.c
+gcc -g   -c -o second.o second.c
+lex  -t first.l > first.c
+gcc -g   -c -o first.o first.c
+gcc -g   -c -o calc.o calc.c
+gcc -g second.o first.o calc.o -lm -o calc
+rm first.c second.c
+for djz24 start time: Tue Oct 15 10:30:26 2013
+SIZEOF int: 4 long: 8 long long: 8 float: 4 double: 8, long double: 16
+Enter calculator expression and $ to exit
+for djz24 start time: Tue Oct 15 10:30:26 2013
+SIZEOF int: 4 long: 8 long long: 8 float: 4 double: 8, long double: 16
+Enter calculator expression and $ to exit
+739260
+3108
+15
+-3108
+-3552
+739260
+-739260
+for djz24 start time: Tue Oct 15 10:30:26 2013
+SIZEOF int: 4 long: 8 long long: 8 float: 4 double: 8, long double: 16
+Enter calculator expression and $ to exit
+111
+73926
+1
+-111
+-555
+-111
+555
+for djz24 start time: Tue Oct 15 10:30:26 2013
+SIZEOF int: 4 long: 8 long long: 8 float: 4 double: 8, long double: 16
+Enter calculator expression and $ to exit
+73
+31974
+1
+-73
+-365
+-73
+365
+for djz24 start time: Tue Oct 15 10:30:26 2013
+SIZEOF int: 4 long: 8 long long: 8 float: 4 double: 8, long double: 16
+Enter calculator expression and $ to exit
+273
+447174
+1
+-273
+-1365
+-273
+1365
+for djz24 start time: Tue Oct 15 10:30:26 2013
+SIZEOF int: 4 long: 8 long long: 8 float: 4 double: 8, long double: 16
+Enter calculator expression and $ to exit
+1.52346
+5.08307
+1.94155
+-1.52346
+-4.75954
+-1.52346
+4.75954
+for djz24 start time: Tue Oct 15 10:30:26 2013
+SIZEOF int: 4 long: 8 long long: 8 float: 4 double: 8, long double: 16
+Enter calculator expression and $ to exit
+1.52346
+5.08307
+1.94155
+-1.52346
+-4.75954
+-1.52346
+4.75954
+for djz24 start time: Tue Oct 15 10:30:26 2013
+SIZEOF int: 4 long: 8 long long: 8 float: 4 double: 8, long double: 16
+Enter calculator expression and $ to exit
+18
+14241
+237
+-13090
+-19
+-14260
+13089
+for djz24 start time: Tue Oct 15 10:30:26 2013
+SIZEOF int: 4 long: 8 long long: 8 float: 4 double: 8, long double: 16
+Enter calculator expression and $ to exit
+8
+214
+30
+-23
+-9
+-223
+22
+for djz24 start time: Tue Oct 15 10:30:26 2013
+SIZEOF int: 4 long: 8 long long: 8 float: 4 double: 8, long double: 16
+Enter calculator expression and $ to exit
+1
+2
+0
+-3
+-2
+-4
+2
