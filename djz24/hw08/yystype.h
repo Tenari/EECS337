@@ -5,7 +5,7 @@
 * DESC:		EECS 337 Assignment 6
 *      		include file for the Calculator page 295-296
 *
-* AUTHOR:	caseid
+* AUTHOR:	djz24
 *
 * DATE:		October 8, 2013
 *

@@ -5,7 +5,7 @@
 * DESC:		EECS 337 Assignment 6
 *      		main program for the Calculator page 295-296
 *
-* AUTHOR:	caseid
+* AUTHOR:	djz24
 *
 * DATE:		October 8, 2013
 *
@@ -139,7 +139,7 @@ int	main( int argc, char *argv[])
  *	print start of test time
  */
 	time( &t);
-	fprintf( stdout, "for caseid start time: %s", ctime( &t));
+	fprintf( stdout, "for djz24 start time: %s", ctime( &t));
 /*
  *	initialize or constructor, init
  */
