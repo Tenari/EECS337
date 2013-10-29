@@ -63,10 +63,10 @@ expr	: expr '+' expr	    { $$.quad = new_quad1( '+', $1.quad, $3.quad); }
 	| expr '%' expr	        { $$.quad = new_quad1( '%', $1.quad, $3.quad); }
 	| '~' expr	            { $$.quad = new_quad2( '~', $2.quad); }
 	| expr '|' expr	        { $$.quad = new_quad1( '|', $1.quad, $3.quad); }
-	| '(' expr ')'	        { $$.quad = new_quad3( '=', $1.index, $3.quad); }
+	| '(' expr ')'	        { $$.quad = $2.quad; }
 	| '-' expr %prec UMINUS { $$.quad = new_quad2( UMINUS, $2.quad); }
-	| number                { $$.quad = new_quad3( '=', $1.index, $3.quad); }
-  | ident                 { $$.quad = new_quad3( '=', $1.index, $3.quad); }
+	| number                { $$.quad = new_quad3( '=', $1.index, 0); }
+  | ident                 { $$.quad = new_quad3( '=', $1.index, 0); }
 	;
 
 number	: CONSTANT;
