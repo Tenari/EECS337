@@ -303,10 +303,37 @@ QUAD	*new_quad3( int operator, int index, QUAD *q1)
 
 /*
  * allocate a quad5 function
-     $$.quad = new_quad5( IFTRUE, $3.quad, $5.quad, 0);
-     $$.quad = new_quad5( IFTRUE, $3.quad, $5.quad, $7.quad);
+     $$.quad = new_quad5( IFTRUE, $3.quad, $5.quad, 0);       // if
+     $$.quad = new_quad5( IFTRUE, $3.quad, $5.quad, $7.quad); // if else
  */
 QUAD *new_quad5( int operator, QUAD *q1, QUAD *q2, QUAD *q3)
 {
+  QUAD *me;
+  QUAD *last1 = end_quad_list( q1);
+  QUAD *last2 = end_quad_list( q2);
+  QUAD *label1 = new_quad( LABEL, TYPE_LABEL, next_label(), 0,0, 0,0);
+  QUAD *last3;
+  QUAD *label2;
+  QUAD *theGoto;
+  if ( q3 == 0){
+    me = new_quad( operator, last1->dst_type, last1->dst_index, label1->dst_type, label1->dst_index, 0, 0);
+  } else {
+    last3 = end_quad_list( q3);
+    label2 = new_quad( LABEL, TYPE_LABEL, next_label(), 0,0, 0,0);
+    theGoto = new_quad( GOTO, TYPE_LABEL, label2->dst_index, 0,0, 0,0);
+    me = new_quad( operator, last1->dst_type, last1->dst_index, label1->dst_type, label1->dst_index, label2->dst_type, label2->dst_index);
+  }
+
+  last1->next = me;
+  me->next    = q2;
+  if ( q3 != 0){
+    last2->next  = theGoto;
+    theGoto->next= label1;
+    label1->next = q3;
+    last3->next  = label2;
+  } else {
+    last2->next = label1;
+  }
+
   return q1;
 }
