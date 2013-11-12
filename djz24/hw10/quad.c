@@ -352,5 +352,27 @@ QUAD *new_quad5( int operator, QUAD *q1, QUAD *q2, QUAD *q3)
  */
 QUAD *new_quad8( int operator, int index, QUAD *q1, QUAD *q2)
 {
+  // declare variables
+  QUAD *newQuad;
+  QUAD *multQuad;
+  QUAD *last1 = end_quad_list( q1);
+  char size[2];
+  int  multIndex;
+
+  // make new quad(s)
+  if ( q2 == 0){
+    size[0]  = (char)data.st[ index].specifier+48;
+    size[1]  = 0;
+    multIndex= install( TYPE_CONSTANT, size, 2, FORMAT_DECIMAL);
+    multQuad = new_quad( '*', TYPE_TEMPORARY, next_temp(), last1->dst_type, last1->dst_index, TYPE_CONSTANT, multIndex);
+    newQuad  = new_quad( operator, TYPE_TEMPORARY, next_temp(), data.st[ index].type, index, multQuad->dst_type, multQuad->dst_index);
+  } else {
+  }
+
+  // link up new quad and old quads correctly
+  last1->next    = multQuad;
+  multQuad->next = newQuad;
+
+  // return the head quad in the linked list
   return q1;
 }

@@ -1,0 +1,1 @@
+-bash: ./hw10_test.sh: Permission denied
