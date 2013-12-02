@@ -71,7 +71,7 @@ IS			(u|U|l|L)*
 {D}+{E}{FS}?		    { count(); yylval.tuple = constant_float( yytext, yyleng); return(CONSTANT); }
 {D}*"."{D}+({E})?{FS}?	{ count(); yylval.tuple = constant_float( yytext, yyleng); return(CONSTANT); }
 {D}+"."{D}*({E})?{FS}?	{ count(); yylval.tuple = constant_float( yytext, yyleng); return(CONSTANT); }
-\"(\\.|[^\\"])*\"	  { count(); yylval.tuple = constant_string_literal( yytext, yyleng); return(STRING_LITERAL); }
+\"(\\.|[^\\"])*\"	  { count(); yylval.tuple = string_literal( yytext, yyleng); return(STRING_LITERAL); }
 
 ">>="			{ count(); yylval.token = RIGHT_ASSIGN; return(RIGHT_ASSIGN); }
 "<<="			{ count(); yylval.token = LEFT_ASSIGN; return(LEFT_ASSIGN); }

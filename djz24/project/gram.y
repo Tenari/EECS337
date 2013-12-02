@@ -28,8 +28,22 @@
 
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
 
-%start file
+%start code
 %%
+
+code
+  : file
+    {
+#ifdef YYDEBUG
+      if( IS_FLAGS_DEBUG( data.flags))
+      {
+        printf( "Debug: yacc tuples\n");
+        print_tuple_list( $1.tuple);
+      }
+#endif
+      code_generator_pic16f1827( $1.tuple);
+    }
+  ;
 
 primary_expr
 	: identifier
@@ -169,8 +183,12 @@ constant_expr
 	;
 
 declaration
-	: declaration_specifiers ';'
+	: declaration_specifiers ';'  { $$.tuple = 0; }
 	| declaration_specifiers init_declarator_list ';'
+    {
+      $$.tuple = symbol_declaration( $1.token, $2.tuple);
+      $$.tuple = tuple_declaration( $1.token, $$.tuple);
+    }
 	;
 
 declaration_specifiers
@@ -187,11 +205,13 @@ declaration_specifiers
 init_declarator_list
 	: init_declarator
 	| init_declarator_list ',' init_declarator
+    { $$.tuple = symbol_init_declarator_list( $1.tuple, $3.tuple); }
 	;
 
 init_declarator
 	: declarator
 	| declarator '=' initializer
+    { $$.tuple = symbol_init_declarator( $1.tuple, $3.tuple); }
 	;
 
 storage_class_specifier
@@ -367,12 +387,21 @@ labeled_statement
 	| DEFAULT ':' statement
 	;
 
-compound_statement
-	: '{' '}'
-	| '{' statement_list '}'
-	| '{' declaration_list '}'
-	| '{' declaration_list statement_list '}'
-	;
+left_bracket : '{'   { symbol_left_bracket();  }
+  ;
+
+right_bracket : '}'  { symbol_right_bracket(); }
+  ;
+
+compound_statement 
+  : left_bracket right_bracket                  { $$.tuple = 0; }
+  | left_bracket statement_list right_bracket   { $$.tuple = $2.tuple; }
+  | left_bracket declaration_list right_bracket { $$.tuple = $2.tuple; }
+  | left_bracket declaration_list statement_list right_bracket
+    {
+      $$.tuple = tuple_tail_to_head( $2.tuple, $3.tuple);
+    }
+  ;
 
 declaration_list
 	: declaration
