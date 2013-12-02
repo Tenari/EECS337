@@ -14,13 +14,19 @@
 *
 *******************************************************************************/
 %{
-#include <ctype.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <string.h>
+#include <ctype.h>
 #include "yystype.h"
 #include "y.tab.h"
+#include "codegen.c"
+#include "codegen2.c"
+TUPLE *tuple_list;
 %}
 
-%start lines
+%start file
 
 %token CONSTANT
 %token IDENTIFIER
@@ -51,23 +57,61 @@
 
 %% 	/* beginning of rules section */
 
-lines : lines stmts '\n' 
-    {
-      /*
-      * print the quad list
-      */
-      print_quad_list( $2.quad);
-      /*
-      * free the quad list
-      */
-      free_quad_list( $2.quad);
-    }
-  | lines decls '\n'
-  | lines error '\n' { yyerror(" reenter previous line: "); yyerrok; }
-  | /* empty */
+file : lines
+  {
+    /*
+     * print the quad list
+     */
+    print_quad_list( $1.quad );
+    /*
+     * generate the tuple from quad list
+     */
+    tuple_list = generate_quad_2_tuple( $1.quad);
+    /*
+     * free the quad list
+     */
+    free_quad_list( $1.quad);
+    /*
+     * call the code generator
+     */
+    code_generator_pic16f1827( tuple_list);
+  }
 ;
-decls : type ident ';'            { new_symbol( $1.index, $2.index, 0); }
-  | type ident '[' number ']' ';' { new_symbol( $1.index, $2.index, $4.index); }
+lines : lines stmts
+    {
+      $$.quad = end_quad_list( $1.quad);
+      if( $$.quad)
+      {
+       $$.quad->next = $2.quad;
+       $$.quad = $1.quad;
+      }
+      else
+       $$.quad = $2.quad;
+    }
+  | lines decls
+    {
+      $$.quad = end_quad_list( $1.quad);
+      if( $$.quad)
+      {
+       $$.quad->next = $2.quad;
+       $$.quad = $1.quad;
+      }
+      else
+       $$.quad = $2.quad;
+    }
+  | stmts
+  | decls
+  ;
+decls : type ident ';'
+    {
+      new_symbol( $1.index, $2.index, 0);
+      $$.quad = (QUAD*)0;
+    }
+  | type ident '[' number ']' ';'
+    {
+      new_symbol( $1.index, $2.index, $4.index);
+      $$.quad = (QUAD*)0;
+    }
   ;
 type : CHAR
   | SHORT

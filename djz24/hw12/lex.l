@@ -74,8 +74,8 @@ int install( int type, char *buffer, unsigned int length, int format)
 ">="   { return( GE); }
 "=="   { return( EQ); }
 "!="   { return( NE); }
-" "    {/*do nothing*/}
-\n|.   { return( yytext[ 0]); /* return everything else */ }
+[ \t\n] { /* ignore white characters */ }
+.      { return(yytext[0]); }
 
 %%
 

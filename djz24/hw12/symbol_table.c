@@ -79,19 +79,23 @@ int	new_symbol( int specifier, int identifier, int constant)
 	{
 	case CHAR:
 	     data.st[ identifier].specifier = SPECIFIER_CHAR;
-//	     data.st[ identifier].sizeofspecifier = install( TYPE_CONSTANT, "1", 2, FORMAT_DECIMAL);
+	     data.st[ identifier].sizeofspecifier = install( TYPE_CONSTANT, "1", 2, FORMAT_DECIMAL);
+       data.st[ identifier].address = get_address( 1); //char
 	     break;
 	case SHORT:
 	     data.st[ identifier].specifier = SPECIFIER_SHORT;
 	     data.st[ identifier].sizeofspecifier = install( TYPE_CONSTANT, "2", 2, FORMAT_DECIMAL);
+       data.st[ identifier].address = get_address( 2); //short
 	     break;
 	case INT:
 	     data.st[ identifier].specifier = SPECIFIER_INT;
 	     data.st[ identifier].sizeofspecifier = install( TYPE_CONSTANT, "4", 2, FORMAT_DECIMAL);
+       data.st[ identifier].address = get_address( 4); // int
 	     break;
 	case LONG:
 	     data.st[ identifier].specifier = SPECIFIER_LONG;
 	     data.st[ identifier].sizeofspecifier = install( TYPE_CONSTANT, "8", 2, FORMAT_DECIMAL);
+       data.st[ identifier].address = get_address( 8); //long
 	     break;
 	}
 /*
@@ -112,4 +116,3 @@ int	new_symbol( int specifier, int identifier, int constant)
 	}
 	return 0;
 }
-

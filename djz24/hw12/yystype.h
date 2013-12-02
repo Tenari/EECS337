@@ -57,7 +57,7 @@ TUPLE
 {
 TUPLE *next;
 int token;
-unsigned charvalue;
+unsigned char value;
 int address;
 #define MASK_VALUE 0x0001
 #define MASK_ADDRESS 0x0002
@@ -181,7 +181,7 @@ DATA
 	SYMBOL_TABLE st[ MAX_SYMBOL_TABLES];
 	unsigned int	index;
 #define TOP_MEMORY 0x0020
-#define BOTTOM_MEMORY0x007f
+#define BOTTOM_MEMORY 0x007f
   int address;
 };
 

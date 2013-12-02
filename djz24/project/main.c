@@ -1,24 +1,16 @@
 /*******************************************************************************
 *
-* FILE:		main.c (calc.c)
+* FILE:		main.c
 *
-* DESC:		EECS 337 Assignment 6
-*      		main program for the Calculator page 295-296
+* DESC:		EECS 337 Project
 *
-* AUTHOR:	djz24
+* AUTHOR:	caseid
 *
-* DATE:		October 8, 2013
+* DATE:		December 5, 2013
 *
 * EDIT HISTORY:	
 *
-*		Updated for EECS 337 Assignment 7 October 15, 2013 
-*		Updated for EECS 337 Assignment 8 October 29, 2013 
-*
 *******************************************************************************/
-#include	<stdio.h>
-#include	<stdlib.h>
-#include	<time.h>
-#include	<string.h>
 #include	"yystype.h"
 
 /*
@@ -32,6 +24,7 @@ DATA	data;
 int	main_init( void)
 {
 	memset((void*)&data, 0, sizeof( DATA));
+	data.address = TOP_MEMORY;
 	return 0;
 }
 
@@ -50,16 +43,26 @@ int	main_exit( void)
 	}
 #endif
 /*
- *	check for a memory leak
+ *	deallocate the symbol table list
+ */
+	free_tuple_list( data.symbol_table);
+	free_tuple_list( data.symbol_table_free);
+/*
+ *	check if memory leak
  */
 	if( data.memory)
-		fprintf( stderr, "Error: memory leak: %d\n", data.memory);
-    /*
-     * check for compiler errors 
-     */
-  if( data.errors)
-    fprintf( stderr, "Errors: %d\n", data.errors);
-  return data.errors;
+		fprintf( stderr, "Error: memory deallocation error: %d\n", data.memory);
+/*
+ *	check if compiler warnings
+ */
+	if( data.warnings)
+		fprintf( stderr, "Warning: compiler warnings: %d\n", data.warnings);
+/*
+ *	check if compiler errors 
+ */
+	if( data.errors)
+		fprintf( stderr, "Error: compiler errors: %d\n", data.errors);
+	return( data.errors);
 }
 
 /*
@@ -72,14 +75,14 @@ void	main_process_flags( char *command)
 	switch( *command)
 	{
 	case '-':
-		if( !strncmp( command, "-debug", strlen( command)))
+		if( !strncmp( command, "-echo", strlen( command)))
 		{
-			CLR_FLAGS_DEBUG( data.flags);
+			CLR_FLAGS_ECHO( data.flags);
 			return;
 		}
-		else if( !strncmp( command, "-symbol", strlen( command)))
+		else if( !strncmp( command, "-debug", strlen( command)))
 		{
-			CLR_FLAGS_SYMBOL( data.flags);
+			CLR_FLAGS_DEBUG( data.flags);
 			return;
 		}
 		else if( !strncmp( command, "-yydebug", strlen( command)))
@@ -87,16 +90,26 @@ void	main_process_flags( char *command)
 			yydebug = 0;
 			return;
 		}
-		break;
-	case '+':
-		if( !strncmp( command, "+debug", strlen( command)))
+		else if( !strncmp( command, "-symbol", strlen( command)))
 		{
-			SET_FLAGS_DEBUG( data.flags);
+			CLR_FLAGS_SYMBOL( data.flags);
 			return;
 		}
-		else if( !strncmp( command, "+symbol", strlen( command)))
+		else if( !strncmp( command, "-address", strlen( command)))
 		{
-			SET_FLAGS_SYMBOL( data.flags);
+			CLR_FLAGS_ADDRESS( data.flags);
+			return;
+		}
+		break;
+	case '+':
+		if( !strncmp( command, "+echo", strlen( command)))
+		{
+			SET_FLAGS_ECHO( data.flags);
+			return;
+		}
+		else if( !strncmp( command, "+debug", strlen( command)))
+		{
+			SET_FLAGS_DEBUG( data.flags);
 			return;
 		}
 		else if( !strncmp( command, "+yydebug", strlen( command)))
@@ -104,11 +117,21 @@ void	main_process_flags( char *command)
 			yydebug = 1;
 			return;
 		}
-    else if( !strncmp( command, "+test", strlen( command)))
-    {
-      code_generator_instr_test();
-      exit( 0);
-    }
+		else if( !strncmp( command, "+symbol", strlen( command)))
+		{
+			SET_FLAGS_SYMBOL( data.flags);
+			return;
+		}
+		else if( !strncmp( command, "+address", strlen( command)))
+		{
+			SET_FLAGS_ADDRESS( data.flags);
+			return;
+		}
+		else if( !strncmp( command, "+test", strlen( command)))
+		{
+			code_generator_instr_test();
+			exit( 0);
+		}
 		break;
 	default:
 /*
@@ -126,6 +149,7 @@ void	main_process_flags( char *command)
 			if( status = yyparse())
 			{
 				fprintf( stderr, "Error: yyparse %d\n", status);
+				data.errors++;
 			}
 /*
  *	close file 
@@ -134,13 +158,13 @@ void	main_process_flags( char *command)
 			return;
 		}
 	}
-	fprintf( stdout, "Usage: calc [[+|-]debug] [[+|-]symbol] [[+|-]yydebug] [filename] [...]\n");
+	fprintf( stdout, "Usage: ansi_c [[+|-]echo] [[+|-]debug] [[+|-]yydebug] [[+|-]symbol] [[+|-]address] [+test] [filename] [...]\n");
 	exit( -1);
 }
 
-/*******************************************************************************
+/*
  *	main program
- ******************************************************************************/
+ */
 int	main( int argc, char *argv[])
 {
 	int	status;
@@ -149,7 +173,7 @@ int	main( int argc, char *argv[])
  *	print start of test time
  */
 	time( &t);
-	fprintf( stdout, "for djz24 start time: %s", ctime( &t));
+	fprintf( stdout, "; for caseid start time: %s", ctime( &t));
 /*
  *	initialize or constructor, init
  */
@@ -159,7 +183,7 @@ int	main( int argc, char *argv[])
 		return status;
 	}
 /*
- *	check command line
+ *	process the command line args
  */
 	while( --argc)
 	       main_process_flags( *++argv);
@@ -171,10 +195,10 @@ int	main( int argc, char *argv[])
 /*
  *	so use stdin and call the parser
  */
-		printf( "Enter calculator expression and $ to exit\n");
 		if(( status = yyparse()))
 		{
 			fprintf( stderr, "Error: yyparse %d\n", status);
+				data.errors++;
 		}
 	}
 /*
@@ -186,4 +210,3 @@ int	main( int argc, char *argv[])
 	}
 	return status;
 }
-
