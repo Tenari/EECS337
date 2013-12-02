@@ -47,16 +47,22 @@ code
 
 primary_expr
 	: identifier
+    { $$.tuple = tuple_primary_expr_identifier( $1.tuple); }
 	| CONSTANT
+    { $$.tuple = tuple_primary_expr_constant( $1.tuple); }
 	| STRING_LITERAL
+    { $$.tuple = tuple_primary_expr_string_literal( $1.tuple); }
 	| '(' expr ')'
+    { $$ = $2; /* C allows struct to struct copy */ }
 	;
 
 postfix_expr
 	: primary_expr
 	| postfix_expr '[' expr ']'
 	| postfix_expr '(' ')'
+    { $$.tuple = tuple_postfix_expr( $1.tuple, 0); }
 	| postfix_expr '(' argument_expr_list ')'
+    { $$.tuple = tuple_postfix_expr( $1.tuple, $3.tuple); }
 	| postfix_expr '.' identifier
 	| postfix_expr PTR_OP identifier
 	| postfix_expr INC_OP
@@ -66,6 +72,7 @@ postfix_expr
 argument_expr_list
 	: assignment_expr
 	| argument_expr_list ',' assignment_expr
+    { $$.tuple = tuple_tail_to_head( $1.tuple, $3.tuple); }
 	;
 
 unary_expr
@@ -101,6 +108,7 @@ multiplicative_expr
 additive_expr
 	: multiplicative_expr
 	| additive_expr '+' multiplicative_expr
+    { $$.tuple = tuple_additive_expr( I_ADD, $1.tuple, $3.tuple); }
 	| additive_expr '-' multiplicative_expr
 	;
 
@@ -157,6 +165,7 @@ conditional_expr
 assignment_expr
 	: conditional_expr
 	| unary_expr assignment_operator assignment_expr
+    { $$.tuple = tuple_assignment_expr( $1.tuple, $2.token, $3.tuple); }
 	;
 
 assignment_operator
@@ -288,17 +297,19 @@ enumerator
 
 declarator
 	: declarator2
-	| pointer declarator2
+	| pointer declarator2    { $$ = $2; }
 	;
 
 declarator2
 	: identifier
-	| '(' declarator ')'
+	| '(' declarator ')'     { $$ = $2; }
 	| declarator2 '[' ']'
 	| declarator2 '[' constant_expr ']'
 	| declarator2 '(' ')'
 	| declarator2 '(' parameter_type_list ')'
+    { $$.tuple = tuple_tail_to_head( $1.tuple, $3.tuple); }
 	| declarator2 '(' parameter_identifier_list ')'
+    { $$.tuple = tuple_tail_to_head( $1.tuple, $3.tuple); }
 	;
 
 pointer
@@ -330,11 +341,13 @@ parameter_type_list
 
 parameter_list
 	: parameter_declaration
+    { $$.tuple = tuple_parameter_list( $1.tuple, 0); }
 	| parameter_list ',' parameter_declaration
+    { $$.tuple = tuple_parameter_list( $1.tuple, $3.tuple); }
 	;
 
 parameter_declaration
-	: type_specifier_list declarator
+	: type_specifier_list declarator   { $$ = $2; }
 	| type_name
 	;
 
@@ -406,11 +419,13 @@ compound_statement
 declaration_list
 	: declaration
 	| declaration_list declaration
+    { $$.tuple = tuple_tail_to_head( $1.tuple, $2.tuple); }
 	;
 
 statement_list
 	: statement
 	| statement_list statement
+    { $$.tuple = tuple_tail_to_head( $1.tuple, $2.tuple); }
 	;
 
 expression_statement
@@ -442,7 +457,9 @@ jump_statement
 	| CONTINUE ';'
 	| BREAK ';'
 	| RETURN ';'
+    { $$.tuple = new_tuple( I_RETURN, 0, 0, MASK_INSTR, 0, 0); }
 	| RETURN expr ';'
+    { $$.tuple = tuple_jump_statement( $2.tuple); }
 	;
 
 file
@@ -457,12 +474,15 @@ external_definition
 
 function_definition
 	: declarator function_body
+    { $$.tuple = tuple_function_definition( 0, $1.tuple, $2.tuple); }
 	| declaration_specifiers declarator function_body
+    { $$.tuple = tuple_function_definition( $1.token, $2.tuple, $3.tuple); }
 	;
 
 function_body
 	: compound_statement
 	| declaration_list compound_statement
+    { $$.tuple = tuple_tail_to_head( $1.tuple, $2.tuple); }
 	;
 
 identifier
