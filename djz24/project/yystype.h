@@ -51,6 +51,13 @@
 #define I_RETFIE	27
 #define I_RETURN	28
 #define I_SLEEP		29
+#define I_ASRF		30
+#define I_LSLF		31
+#define I_LSRF		32
+#define I_BRA		33
+#define I_BRW		34
+#define I_CALLW		35
+#define I_RESET		36
 /*
  *	define a tuple structure
  *	supports: CONSTANT STRING_LITERAL IDENTIFIER types
@@ -69,6 +76,8 @@ TUPLE
 #define	MASK_F_REG	0x0010
 #define	MASK_INSTR	0x0020
 #define	MASK_PRINT	0x0040
+#define	MASK_BSR	0x0080
+#define	MASK_PCLATH	0x0100
 	int		mask;
 	char		*buffer;
 	int		length;

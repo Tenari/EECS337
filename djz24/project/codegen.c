@@ -243,9 +243,15 @@ void	code_generator_instr_postfix( TUPLE *tuple)
 	switch( tuple->token)
 	{
 	case I_MOV:
-		if( tuple->mask & MASK_VALUE)
-			printf( "lw\t");
-		else if( tuple->mask & MASK_W_REG || tuple->mask & MASK_F_REG)
+		if( tuple->mask & MASK_VALUE) {
+      if( tuple->mask & MASK_BSR)
+        printf( "lb\t");
+      else if( tuple->mask & MASK_PCLATH)
+        printf( "lp\t");
+      else
+        printf( "lw\t");
+
+		} else if( tuple->mask & MASK_W_REG || tuple->mask & MASK_F_REG)
 			printf( "f\t");
 		else
 			printf( "wf\t");
@@ -305,6 +311,10 @@ void	code_generator_instr( TUPLE *tuple)
 	case I_BSF:
 	case I_BTFSC:
 	case I_BTFSS:
+	case I_ASRF:
+	case I_LSLF:
+	case I_LSRF:
+	case I_BRA:
 		printf( "\t%s\t", instr_table[ tuple->token]);
 		code_generator_operand( tuple);
 		break;
@@ -314,6 +324,9 @@ void	code_generator_instr( TUPLE *tuple)
 	case I_RETFIE:
 	case I_RETURN:
 	case I_SLEEP:
+	case I_BRW:
+	case I_CALLW:
+	case I_RESET:
 		printf( "\t%s\n", instr_table[ tuple->token]);
 		break;
 	}
@@ -470,7 +483,7 @@ void	code_generator_instr_test( void)
  *	instruction format. The generated instruction sequence does NOT
  *	represent a meaningful program!
  */
-	for( index = 0; index <= 52; index++)
+	for( index = 0; index <= 61; index++)
 	{
 		switch( index)
 		{
@@ -685,6 +698,42 @@ void	code_generator_instr_test( void)
 		case 52:
 /*    RETLW   value        Return from subroutine, placing value into W */
 			tuple = new_tuple( I_RETLW, 0x0f, 0, MASK_VALUE, 0, 0);
+			break;
+		case 53:
+//    ASRF    address, W
+			tuple = new_tuple( I_ASRF, 0, get_address( 1), MASK_ADDRESS | MASK_W_REG, 0, 0);
+			break;
+		case 54:
+//    LSLF    address, W
+			tuple = new_tuple( I_LSLF, 0, get_address( 1), MASK_ADDRESS | MASK_W_REG, 0, 0);
+			break;
+		case 55:
+//    LSRF    address, W
+			tuple = new_tuple( I_LSRF, 0, get_address( 1), MASK_ADDRESS | MASK_W_REG, 0, 0);
+			break;
+		case 56:
+//    BRA     value
+			tuple = new_tuple( I_BRA, 0x0f, 0, MASK_VALUE, 0, 0);
+			break;
+		case 57:
+//    BRW
+			tuple = new_tuple( I_BRW, 0, 0, MASK_INSTR, 0, 0);
+			break;
+		case 58:
+//    CALLW
+			tuple = new_tuple( I_CALLW, 0, 0, MASK_INSTR, 0, 0);
+			break;
+		case 59:
+//    RESET
+			tuple = new_tuple( I_RESET, 0, 0, MASK_INSTR, 0, 0);
+			break;
+		case 60:
+/*    MOVLB   value        Place value in BSR */
+			tuple = new_tuple( I_MOV, 0x0f, 0, MASK_VALUE | MASK_BSR, 0, 0);
+			break;
+		case 61:
+/*    MOVLP   value        Place value in PCLATH */
+			tuple = new_tuple( I_MOV, 0x0f, 0, MASK_VALUE | MASK_PCLATH, 0, 0);
 			break;
 		}
 		tuple_head = tuple_tail_to_head( tuple_head, tuple);
